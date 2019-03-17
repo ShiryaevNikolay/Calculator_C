@@ -50,11 +50,11 @@ int main(void) {
 				break;
 			case 5:
 				c = 1;
-				for(int i = 1; i < a; i++) c = c * i;
+				for(int i = 1; i <= a; i++) c = c * i;
 				printf("Результат: %d", c);
 				break;
 			case 6:
-				for(int i = 1; i <= b; i++) {
+				for(int i = 2; i <= b; i++) {
 					a = a * a;
 				}
 				printf("Результат: %d", a);
