@@ -39,33 +39,35 @@ int main(void) {
 		switch(k) {
 			case 1:
 				c = a + b;
-				printf("Результат: %d", c);
+				printf("Результат: %d\n", c);
 				break;
 			case 2:
 				c = a - b;
-				printf("Результат: %d", c);
+				printf("Результат: %d\n", c);
 				break;
 			case 3:
 				c = a * b;
-				printf("Результат: %d", c);
+				printf("Результат: %d\n", c);
 				break;
 			case 4:
 				d = a / b;
-				printf("Результат: %f", d);
+				printf("Результат: %f\n", d);
 				break;
 			case 5:
 				c = 1;
 				for(int i = 1; i <= a; i++) c = c * i;
-				printf("Результат: %d", c);
+				printf("Результат: %d\n", c);
 				break;
 			case 6:
 				for(int i = 2; i <= b; i++) {
 					a = a * a;
 				}
-				printf("Результат: %d", a);
+				printf("Результат: %d\n", a);
 				break;
 			default: printf("Неправльный ввод.\n");
 		}
+
+	printf("\n");
 
 	return EXIT_SUCCESS;
 }
