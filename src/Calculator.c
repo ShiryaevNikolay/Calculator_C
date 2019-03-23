@@ -60,8 +60,13 @@ int main(void) {
 				printf("Результат: %d\n", c);
 				break;
 			case 6:
-				for(int i = 2; i <= b; i++) {
-					a = a * a;
+				if(b != 0) {
+					for(int i = 2; i <= b; i++) {
+						a = a * a;
+					}
+				}
+				else {
+					a = 1;
 				}
 				printf("Результат: %d\n", a);
 				break;
