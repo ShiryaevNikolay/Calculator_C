@@ -1,10 +1,10 @@
 /*
  ============================================================================
  Name        : Calculator.c
- Author      : Shiryaev
+ Author      : Shiryaev Nikolay
  Version     :
  Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Description : Calculator in C, Ansi-style
  ============================================================================
  */
 
