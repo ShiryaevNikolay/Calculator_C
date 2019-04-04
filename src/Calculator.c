@@ -37,21 +37,21 @@ float regular_calculator() {
 	float c;
 	switch(k) {
 		case 1:
-			printf("\nРезультат: %f\n\n", a + b);
+			printf("\nРезультат: %.2f\n\n", a + b);
 			break;
 		case 2:
-			printf("\nРезультат: %f\n\n", a - b);
+			printf("\nРезультат: %.2f\n\n", a - b);
 			break;
 		case 3:;
-			printf("\nРезультат: %f\n\n", a * b);
+			printf("\nРезультат: %.2f\n\n", a * b);
 			break;
 		case 4:
-			printf("\nРезультат: %f\n\n", a / b);
+			printf("\nРезультат: %.2f\n\n", a / b);
 			break;
 		case 5:
 			c = 1;
 			for(int i = 1; i <= a; i++) c = c * i;
-			printf("\nРезультат: %f\n\n", c);
+			printf("\nРезультат: %.2f\n\n", c);
 			break;
 		case 6:
 			if(b != 0){
@@ -62,7 +62,7 @@ float regular_calculator() {
 			else {
 				a = 1;
 			}
-			printf("\nРезультат: %f\n\n", a);
+			printf("\nРезультат: %.2f\n\n", a);
 			break;
 	}
 
@@ -70,13 +70,21 @@ float regular_calculator() {
 }
 
 float vector_calculator() {
-	int x1, y1, x2, y2, f;
+	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f;
+
+	x1 = calloc(1,sizeof(int));
+	y1 = calloc(1,sizeof(int));
 
 	printf("Введите координаты первого вектора(a) x1 y1: ");
-	scanf("%d %d", &x1, &y1);
+	scanf("%d %d", x1, y1);
+
+	printf("\nx1 = %d\np_x1 = %p\n\n", *x1, x1);
+
+	x2 = calloc(1,sizeof(int));
+	y2 = calloc(1,sizeof(int));
 
 	printf("Введите координаты второго вектора(b) x2 y2: ");
-	scanf("%d %d", &x2, &y2);
+	scanf("%d %d", x2, y2);
 
 	int k;
 	puts("  1) \"+\" - сумма \n  2) \"-\" - разность \n  3) \"*\" - скалярное произведение");
@@ -96,15 +104,20 @@ float vector_calculator() {
 
 	switch(k) {
 		case 1:
-			printf("\n(%d %d) + (%d %d) = (%d, %d)\n\n", x1, y1, x2, y2, x1+x2, y1+y2);
+			printf("\n(%d %d) + (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)+(*x2), (*y1)+(*y2));
 			break;
 		case 2:
-			printf("\n(%d %d) - (%d %d) = (%d, %d)\n\n", x1, y1, x2, y2, x1-x2, y1-y2);
+			printf("\n(%d %d) - (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)-(*x2), (*y1)-(*y2));
 			break;
 		case 3:
-			printf("\n|a|*|b|*cosA = %d\n\n", x1*x2 + y1*y2);
+			printf("\n(a,b) = %d\n\n", (*x1) * (*x2) + (*y1) * (*y2));
 			break;
 	}
+
+	free(x1);
+	free(y1);
+	free(x2);
+	free(y2);
 
 	return EXIT_SUCCESS;
 }
@@ -114,22 +127,25 @@ int main(void) {
 
 	while (exit_from_calculator == 1) {
 		puts("Введите номер калькулятора.");
-		printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n");
+		printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n  3) Выйти из калькулятора.\n");
+
 		int number, f;
 		f = 0;
+
 		while (f == 0) {
 			scanf("%d", &number);
-			if (number > 0 && number < 3) f = 1;
+			if (number > 0 && number < 4) f = 1;
 			else {
 				printf("Такой команды нет. Выберите команду из списка:\n");
-				printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n");
+				printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n  3) Выйти из калькулятора.\n");
 			}
 		}
+		if (number == 3) break;
+		else
+			if (number == 1) regular_calculator();
+			else vector_calculator();
 
-		if (number == 1) regular_calculator();
-		else vector_calculator();
-
-		printf("Продолжить использовать калькулятор? \n1)Да - продолжить\n2)Нет - выйти\n");
+		printf("Продолжить использовать калькулятор? \n  1)Продолжить\n  2)Выйти\n");
 		scanf("%d", &exit_from_calculator);
 	}
 	printf("EXIT");
