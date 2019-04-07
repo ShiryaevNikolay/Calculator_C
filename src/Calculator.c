@@ -76,16 +76,19 @@ float regular_calculator() {
 }
 
 float vector_calculator() {
-	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f;
+	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f, size;
 
-	x1 = calloc(1,sizeof(int));
-	y1 = calloc(1,sizeof(int));
+	printf("Введите кол-во ячеек памяти для одной координаты: ");
+	scanf("%d", &size);
+
+	x1 = calloc(size,sizeof(int));
+	y1 = calloc(size,sizeof(int));
 
 	printf("Введите координаты первого вектора(a) x1 y1: ");
 	scanf("%d %d", x1, y1);
 
-	x2 = calloc(1,sizeof(int));
-	y2 = calloc(1,sizeof(int));
+	x2 = calloc(size,sizeof(int));
+	y2 = calloc(size,sizeof(int));
 
 	printf("Введите координаты второго вектора(b) x2 y2: ");
 	scanf("%d %d", x2, y2);
