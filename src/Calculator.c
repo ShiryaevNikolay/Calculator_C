@@ -71,20 +71,26 @@ float regular_calculator() {
 
 float vector_calculator() {
 	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f;
+	FILE *in_file, *out_file;
 
 	x1 = calloc(1,sizeof(int));
 	y1 = calloc(1,sizeof(int));
 
-	printf("Введите координаты первого вектора(a) x1 y1: ");
-	scanf("%d %d", x1, y1);
-
-	printf("\nx1 = %d\np_x1 = %p\n\n", *x1, x1);
+	//printf("Введите координаты первого вектора(a) x1 y1: ");
+	//scanf("%d %d", x1, y1);
 
 	x2 = calloc(1,sizeof(int));
 	y2 = calloc(1,sizeof(int));
 
-	printf("Введите координаты второго вектора(b) x2 y2: ");
-	scanf("%d %d", x2, y2);
+	//printf("Введите координаты второго вектора(b) x2 y2: ");
+	//scanf("%d %d", x2, y2);
+
+	in_file = fopen("input", "r");
+	out_file = fopen("output", "w");
+
+	fscanf(in_file, "%d %d", x1, y1);
+
+	printf("(x, y) = (%d, %d)", *x1, *y1);
 
 	int k;
 	puts("  1) \"+\" - сумма \n  2) \"-\" - разность \n  3) \"*\" - скалярное произведение");
@@ -113,6 +119,9 @@ float vector_calculator() {
 			printf("\n(a,b) = %d\n\n", (*x1) * (*x2) + (*y1) * (*y2));
 			break;
 	}
+
+	fclose(in_file);
+	fclose(out_file);
 
 	free(x1);
 	free(y1);
