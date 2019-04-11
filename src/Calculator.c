@@ -73,17 +73,15 @@ float regular_calculator() {
 float vector_calculator() {
 	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f;
 
+
+
 	x1 = calloc(1,sizeof(int));
 	y1 = calloc(1,sizeof(int));
 
-	//printf("Введите координаты первого вектора(a) x1 y1: ");
-	//scanf("%d %d", x1, y1);
+
 
 	x2 = calloc(1,sizeof(int));
 	y2 = calloc(1,sizeof(int));
-
-	//printf("Введите координаты второго вектора(b) x2 y2: ");
-	//scanf("%d %d", x2, y2);
 
 	printf("(x, y) = (%d, %d)", *x1, *y1);
 
@@ -122,18 +120,56 @@ float vector_calculator() {
 	return EXIT_SUCCESS;
 }
 
+int calc_keyboard () {
+	int exit_from_calculator = 1;
+
+	while (exit_from_calculator == 1) {
+		puts("Введите номер калькулятора.");
+		printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n");
+		int number, f;
+		f = 0;
+		while (f == 0) {
+			scanf("%d", &number);
+			if (number > 0 && number < 3) f = 1;
+			else {
+				printf("Такой команды нет. Выберите команду из списка:\n");
+				printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n");
+			}
+		}
+
+		if (number == 1) regular_calculator();
+		else vector_calculator();
+
+		printf("Продолжить использовать калькулятор? \n1)Да - продолжить\n2)Нет - выйти\n");
+		scanf("%d", &exit_from_calculator);
+	}
+	printf("EXIT");
+	return 0;
+}
+
+int calc_file () {
+
+}
+
 int main(void) {
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
 	FILE *in_file;
-	char operation;
+	char operation, calc;
 
 	in_file = fopen("input.txt", "r");
 
-	fscanf(in_file, "%c", &operation);
+	fscanf(in_file, "%c %c", &operation, &calc);
 
-	printf("%c", operation);
+	printf("%c %c\n", operation, calc);
+
+	if (calc == "v") {
+		calc_file();
+	}
+	else {
+		calc_keyboard();
+	}
 
 	fclose(in_file);
 
