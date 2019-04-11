@@ -130,6 +130,9 @@ float vector_calculator() {
 }
 
 int main(void) {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
 	int exit_from_calculator = 1;
 
 	while (exit_from_calculator == 1) {
