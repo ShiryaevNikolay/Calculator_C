@@ -54,9 +54,10 @@ float regular_calculator() {
 			printf("\nРезультат: %.2f\n\n", c);
 			break;
 		case 6:
+			c = a;
 			if(b != 0){
-				for(int i = 2; i < b; i++) {
-					a = a * a;
+				for(int i = 1; i < b; i++) {
+					a = a * c;
 				}
 			}
 			else {
@@ -71,7 +72,6 @@ float regular_calculator() {
 
 float vector_calculator() {
 	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f;
-	FILE *in_file, *out_file;
 
 	x1 = calloc(1,sizeof(int));
 	y1 = calloc(1,sizeof(int));
@@ -84,11 +84,6 @@ float vector_calculator() {
 
 	//printf("Введите координаты второго вектора(b) x2 y2: ");
 	//scanf("%d %d", x2, y2);
-
-	in_file = fopen("input", "r");
-	out_file = fopen("output", "w");
-
-	fscanf(in_file, "%d %d", x1, y1);
 
 	printf("(x, y) = (%d, %d)", *x1, *y1);
 
@@ -119,10 +114,6 @@ float vector_calculator() {
 			printf("\n(a,b) = %d\n\n", (*x1) * (*x2) + (*y1) * (*y2));
 			break;
 	}
-
-	fclose(in_file);
-	fclose(out_file);
-
 	free(x1);
 	free(y1);
 	free(x2);
@@ -132,31 +123,20 @@ float vector_calculator() {
 }
 
 int main(void) {
-	int exit_from_calculator = 1;
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
 
-	while (exit_from_calculator == 1) {
-		puts("Введите номер калькулятора.");
-		printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n  3) Выйти из калькулятора.\n");
+	FILE *in_file;
+	char operation;
 
-		int number, f;
-		f = 0;
+	in_file = fopen("input.txt", "r");
 
-		while (f == 0) {
-			scanf("%d", &number);
-			if (number > 0 && number < 4) f = 1;
-			else {
-				printf("Такой команды нет. Выберите команду из списка:\n");
-				printf("  1) Работа с обычными числами.\n  2) Работа с векторами.\n  3) Выйти из калькулятора.\n");
-			}
-		}
-		if (number == 3) break;
-		else
-			if (number == 1) regular_calculator();
-			else vector_calculator();
+	fscanf(in_file, "%c", &operation);
 
-		printf("Продолжить использовать калькулятор? \n  1)Продолжить\n  2)Выйти\n");
-		scanf("%d", &exit_from_calculator);
-	}
+	printf("%c", operation);
+
+	fclose(in_file);
+
 	printf("EXIT");
 	return 0;
 }
