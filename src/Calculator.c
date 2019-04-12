@@ -18,7 +18,7 @@ float regular_calculator_keyboard() {
 	scanf("%f", &a);
 
 	int k;
-	puts("    1) \"+\" - сумма\n    2) \"-\" - разность\n    3) \"*\" - умножение\n    4) \"/\" - деление\n    5) \"!\" - факториал\n    6) \"^\" - степень");
+	puts("\nВыберите операцию:    1) \"+\" - сумма\n    2) \"-\" - разность\n    3) \"*\" - умножение\n    4) \"/\" - деление\n    5) \"!\" - факториал\n    6) \"^\" - степень");
 	printf("Выберите команду: ");
 	scanf("%d", &k);
 	while(f == 0) {
@@ -71,25 +71,27 @@ float regular_calculator_keyboard() {
 }
 
 float vector_calculator_keyboard() {
-	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL, f, size;
+	float *vector1, *vector2;
+	int size, f;
 
-	printf("Введите кол-во ячеек памяти для одной координаты: ");
+	printf("Введите размерность вектора: ");
 	scanf("%d", &size);
 
-	x1 = calloc(size,sizeof(int));
-	y1 = calloc(size,sizeof(int));
+	vector1 = calloc(size,sizeof(float));
+	for (int i = 0; i < size; i++) {
+		printf("Введите координаты первого вектора(a): ");
+		scanf("%f", &vector1[i]);
+	}
 
-	printf("Введите координаты первого вектора(a) x1 y1: ");
-	scanf("%d %d", x1, y1);
+	vector2 = calloc(size,sizeof(float));
 
-	x2 = calloc(size,sizeof(int));
-	y2 = calloc(size,sizeof(int));
-
-	printf("Введите координаты первого вектора(a) x2 y2: ");
-	scanf("%d %d", x2, y2);
+	for (int i = 0; i < size; i++) {
+		printf("Введите координаты второго вектора(b): ");
+		scanf("%f", &vector2[i]);
+	}
 
 	int k;
-	puts("    1) \"+\" - сумма\n    2) \"-\" - разность\n    3) \"*\" - скалярное произведение");
+	puts("\nВыберите операцию:    1) \"+\" - сумма\n    2) \"-\" - разность\n    3) \"*\" - скалярное произведение");
 	printf("Выберите команду: ");
 	scanf("%d", &k);
 
@@ -104,21 +106,33 @@ float vector_calculator_keyboard() {
 		}
 	}
 
+	float result = 0;
 	switch(k) {
 		case 1:
-			printf("\n(%d %d) + (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)+(*x2), (*y1)+(*y2));
+			printf("\nРезультат: (");
+			for (int i = 0; i < size; i++) {
+				printf("%.2f", vector1[i] + vector2[i]);
+				if (i != size-1) printf(" ");
+			}
+			printf(")\n\n");
 			break;
 		case 2:
-			printf("\n(%d %d) - (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)-(*x2), (*y1)-(*y2));
+			printf("\nРезультат: (");
+			for (int i = 0; i < size; i++) {
+				printf("%.2f", vector1[i] - vector2[i]);
+				if (i != size-1) printf(" ");
+			}
+			printf(")\n\n");
 			break;
 		case 3:
-			printf("\n(a,b) = %d\n\n", (*x1) * (*x2) + (*y1) * (*y2));
+			for (int i = 0; i < size; i++) {
+				result += vector1[i] * vector2[i];
+			}
+			printf("\nРезультат: %.2f\n\n", result);
 			break;
 	}
-	free(x1);
-	free(y1);
-	free(x2);
-	free(y2);
+	free(vector1);
+	free(vector2);
 
 	return EXIT_SUCCESS;
 }
@@ -126,8 +140,8 @@ float vector_calculator_keyboard() {
 float regular_calculator_file(FILE *in_file, FILE *out_file, char k) {
 	float *a = NULL, *b = NULL;
 
-	a = calloc(4, sizeof(float));
-	b = calloc(4, sizeof(float));
+	a = calloc(1, sizeof(float));
+	b = calloc(1, sizeof(float));
 
 	fscanf(in_file, "%f", a);
 	fscanf(in_file, "%f", b);
@@ -135,21 +149,21 @@ float regular_calculator_file(FILE *in_file, FILE *out_file, char k) {
 	float c;
 	switch(k) {
 		case '+':
-			fprintf(out_file, "\nРезультат: %.2f\n\n", (*a) + (*b));
+			fprintf(out_file, "Результат: %.2f", (*a) + (*b));
 			break;
 		case '-':
-			fprintf(out_file, "\nРезультат: %.2f\n\n", (*a) - (*b));
+			fprintf(out_file, "Результат: %.2f", (*a) - (*b));
 			break;
 		case '*':
-			fprintf(out_file, "\nРезультат: %.2f\n\n", (*a) * (*b));
+			fprintf(out_file, "Результат: %.2f", (*a) * (*b));
 			break;
 		case '/':
-			fprintf(out_file, "\nРезультат: %.2f\n\n", (*a) / (*b));
+			fprintf(out_file, "Результат: %.2f", (*a) / (*b));
 			break;
 		case '!':
 			c = 1;
 			for(int i = 1; i <= (*a); i++) c = c * i;
-			fprintf(out_file, "\nРезультат: %.2f\n\n", c);
+			fprintf(out_file, "Результат: %.2f", c);
 			break;
 		case '^':
 			c = *a;
@@ -161,7 +175,7 @@ float regular_calculator_file(FILE *in_file, FILE *out_file, char k) {
 			else {
 				*a = 1;
 			}
-			fprintf(out_file, "\nРезультат: %.2f\n\n", *a);
+			fprintf(out_file, "Результат: %.2f", *a);
 			break;
 	}
 
@@ -172,56 +186,71 @@ float regular_calculator_file(FILE *in_file, FILE *out_file, char k) {
 }
 
 float vector_calculator_file(FILE *in_file, FILE *out_file, char k) {
-	int *x1 = NULL, *y1 = NULL, *x2 = NULL, *y2 = NULL;
-	int coordinates, size;
-	x1 = calloc(4,sizeof(int));
-	y1 = calloc(4,sizeof(int));
-	x2 = calloc(4,sizeof(int));
-	y2 = calloc(4,sizeof(int));
+
+	float *vector1, *vector2;
+	int size;
 
 	fscanf(in_file, " %d", &size);
 
-	for (int i = 0; i < size; i++) {
-		fscanf(in_file, "%d", &coordinates);
-		switch(i) {
-			case 0:
-				*x1 = coordinates;
-				break;
-			case 1:
-				*y1 = coordinates;
-				break;
+	vector1 = calloc(size,sizeof(int));
+	vector2 = calloc(size,sizeof(int));
 
-		}
-	}
 	for (int i = 0; i < size; i++) {
-		fscanf(in_file, "%d", &coordinates);
-		switch(i) {
-			case 0:
-				*x2 = coordinates;
-				break;
-			case 1:
-				*y2 = coordinates;
-				break;
-
-		}
+		fscanf(in_file, "%f", &vector1[i]);
 	}
 
+	for (int i = 0; i < size; i++) {
+		fscanf(in_file, "%f", &vector2[i]);
+	}
+
+	float result = 0;
 	switch(k) {
 		case '+':
-			fprintf(out_file, "\n(%d %d) + (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)+(*x2), (*y1)+(*y2));
+			fprintf(out_file, "(");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector1[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ") + (");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector2[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ") = (");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector1[i] + vector2[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ")");
 			break;
 		case '-':
-			fprintf(out_file, "\n(%d %d) - (%d %d) = (%d, %d)\n\n", *x1, *y1, *x2, *y2, (*x1)-(*x2), (*y1)-(*y2));
+			fprintf(out_file, "(");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector1[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ") - (");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector2[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ") = (");
+			for (int i = 0; i < size; i++) {
+				fprintf(out_file, "%.2f", vector1[i] - vector2[i]);
+				if (i != size-1) fprintf(out_file, " ");
+			}
+			fprintf(out_file, ")");
 			break;
 		case '*':
-			fprintf(out_file, "\n(a,b) = %d\n\n", (*x1) * (*x2) + (*y1) * (*y2));
+			for (int i = 0; i < size; i++) {
+				result += vector1[i] * vector2[i];
+			}
+			fprintf(out_file, "(a, b) = %.2f", result);
 			break;
 	}
-	free(x1);
-	free(y1);
-	free(x2);
-	free(y2);
 
+	free(vector1);
+	free(vector2);
 
 	return EXIT_SUCCESS;
 }
@@ -249,7 +278,7 @@ int calc_keyboard() {
 		printf("Продолжить использовать калькулятор? \n1)Да - продолжить\n2)Нет - выйти\n");
 		scanf("%d", &exit_from_calculator);
 	}
-	printf("EXIT");
+
 	return 0;
 }
 
@@ -275,7 +304,6 @@ int main(void) {
 
 	int k;
 	printf("Как вы хотите использовать калькулятор:\n	1) Ввод с клавиатуры\n	2) Работа с файлами\n");
-	//scanf("%d", &k);
 	while (1 == 1) {
 		scanf("%d", &k);
 		if (k > 0 && k < 3) break;
