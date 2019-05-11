@@ -2,7 +2,7 @@
  ============================================================================
  Name        : Structure.c
  Author      : Nikolay Shiryaev
- Version     : List(1.0)
+ Version     : Stack(1.0)
  Copyright   : Your copyright notice
  Description : Calculator(structures) in C
  ============================================================================
@@ -10,200 +10,130 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-typedef struct element {
-	char oper;
-	char vect;
-	int size;
-	float *value1;
-	float *value2;
-	struct element *next;
-} element;
+typedef struct list {
+	char *emelement;
+	struct list *next;
+} list;
 
-element* getLast(element *head){	// Finding the last item
-	if(head == NULL){
-		return NULL;
-	}
-	while(head->next){
-		head = head->next;
-	}
-	return head;
-}
+typedef struct stek {
+	float value;
+	struct stek *next;
+} stek;
 
-void pushBack(element *head, FILE *in_file){	// Adding a item to end of list
-	while(!feof(in_file)){
-		element *last = getLast(head);
-		element *tmp = (element*)malloc(sizeof(element));
-		fscanf(in_file, " %c %c", &tmp->oper, &tmp->vect);
-		if(tmp->vect == 'v') {
-			fscanf(in_file, "%d", &tmp->size);
-			tmp->value1 = malloc(tmp->size*sizeof(float));
-			tmp->value2 = malloc(tmp->size*sizeof(float));
-			for(int i = 0; i < tmp->size; i++){
-				fscanf(in_file, "%f", &tmp->value1[i]);
-			}
-			for(int i = 0; i < tmp->size; i++){
-				fscanf(in_file, "%f", &tmp->value2[i]);
-			}
-		}else{
-			tmp->value1 = malloc(sizeof(float));
-			tmp->value2 = malloc(sizeof(float));
-			fscanf(in_file, "%f %f", tmp->value1, tmp->value2);
+typedef struct arr_val {
+	char c;
+	struct arr_val *next;
+} arr_val;
+
+list* pushBack(FILE *in_file, char c) {
+	arr_val *head_arr; // Объявляем список для чисел >=10 и отрицательных чисел
+	arr_val *last_arr;
+	head_arr = (arr_val*) malloc(sizeof(arr_val));
+	last_arr = (arr_val*) malloc(sizeof(arr_val));
+
+	char *array; // Объявляем массив для чисел >=10 и отрицательных чисел
+	int size = 0; // Кол-во символов в одном элементе (число, операция)
+	while (c != ' ') {
+		size++;
+		if (size == 1) { // Если кол-во симоволов элемента =1, то создаём первый элемент списка(голову)
+			head_arr->c = c;
+			head_arr->next = NULL;
+			last_arr = head_arr;
+		} else { // Иначе заполняем список, пока не достигнем 0
+			arr_val *tmp = (arr_val*) malloc(sizeof(arr_val));
+			tmp->c = c;
+			tmp->next = NULL;
+			last_arr->next = tmp;
+			last_arr = tmp;
 		}
-		tmp->next = NULL;
-		last->next = tmp;
+		if (feof(in_file) != 0)
+			break;
+		else
+			fscanf(in_file, "%c", &c);
 	}
-}
-
-void printList(const element *head){	// Printing the list to console
-	while(head){
-		printf("%c %c", head->oper, head->vect);
-		if(head->vect == 'v'){
-			printf(" %d", head->size);
-			for(int i = 0; i < head->size; i++) printf(" %.0f", head->value1[i]);
-			for(int i = 0; i < head->size; i++) printf(" %.0f", head->value2[i]);
-		}else{
-			printf(" %.0f %.0f", head->value1[0], head->value2[0]);
-		}
-		head = head->next;
-		printf("\n");
+	last_arr = head_arr; // Возвращаемся в начало списка
+	array = malloc(size * sizeof(char));
+	for (int i = 0; i < size; i++) { // Записываем значения из списка в массив
+		array[i] = last_arr->c;
+		last_arr = last_arr->next;
 	}
-}
-
-void regular_calculator_file(FILE *out_file, element *head) {
-	float c;
-	switch(head->oper) {
-		case '+':
-			fprintf(out_file, "Result: %.1f", head->value1[0] + head->value2[0]);
-			break;
-		case '-':
-			fprintf(out_file, "Result: %.1f", head->value1[0] - head->value2[0]);
-			break;
-		case '*':
-			fprintf(out_file, "Result: %.1f", head->value1[0] * head->value2[0]);
-			break;
-		case '/':
-			fprintf(out_file, "Result: %.1f", head->value1[0] / head->value2[0]);
-			break;
-		case '!':
-			c = 1;
-			for(int i = 1; i <= head->value1[0]; i++) c = c * i;
-			fprintf(out_file, "Result: %.1f", c);
-			break;
-		case '^':
-			c = head->value1[0];
-			if(head->value2[0] != 0){
-				for(int i = 1; i < head->value2[0]; i++) {
-					head->value1[0] = head->value1[0] * c;
-				}
-			}
-			else {
-				head->value1[0] = 1;
-			}
-			fprintf(out_file, "Result: %.1f", head->value1[0]);
-			break;
-	}
-}
-
-void vector_calculator_file(FILE *out_file, element *head) {
-	float result = 0;
-	switch(head->oper) {
-		case '+':
-			fprintf(out_file, "Result: (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value1[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ") + (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value2[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ") = (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value1[i] + head->value2[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ")");
-			break;
-		case '-':
-			fprintf(out_file, "Result: (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value1[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ") - (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value2[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ") = (");
-			for (int i = 0; i < head->size; i++) {
-				fprintf(out_file, "%.1f", head->value1[i] - head->value2[i]);
-				if (i != head->size - 1) fprintf(out_file, " ");
-			}
-			fprintf(out_file, ")");
-			break;
-		case '*':
-			for (int i = 0; i < head->size; i++) {
-				result += head->value1[i] * head->value2[i];
-			}
-			fprintf(out_file, "Result: (a, b) = %.1f", result);
-			break;
-	}
+	// Присваиваем массив (число, операция) в новый списка
+	list *tmp = (list*) malloc(sizeof(list));
+	tmp->emelement = array;
+	tmp->next = NULL;
+	return tmp;
 }
 
 int main(void) {
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
-	FILE *in_file, *out_file;
+	FILE *in_file;
 
 	in_file = fopen("input.txt", "r");
-	out_file = fopen("output.txt", "w");
 
-	element *head; // Creating the first list item
-	head = (element*)malloc(sizeof(element));
-	fscanf(in_file, "%c %c", &head->oper, &head->vect);
-	if(head->vect == 'v') {
-		fscanf(in_file, "%d", &head->size);
-		head->value1 = malloc(head->size*sizeof(float));
-		head->value2 = malloc(head->size*sizeof(float));
-		for(int i = 0; i < head->size; i++){
-			fscanf(in_file, "%f", &head->value1[i]);
-		}
-		for(int i = 0; i < head->size; i++){
-			fscanf(in_file, "%f", &head->value2[i]);
-		}
-	}else{
-		head->value1 = malloc(sizeof(float));
-		head->value2 = malloc(sizeof(float));
-		fscanf(in_file, "%f %f", head->value1, head->value2);
+	char c;
+
+	list *head_list;
+	head_list = (list*) malloc(sizeof(list));
+	fscanf(in_file, "%c", &c);
+	head_list = pushBack(in_file, c); // Создание первого элемента списка с числами и операциями
+
+	list *last_list;
+	last_list = (list*) malloc(sizeof(list));
+	last_list = head_list;
+	while (!feof(in_file)) { // Заполняем список числами и операциями
+		fscanf(in_file, "%c", &c);
+		last_list->next = pushBack(in_file, c);
+		last_list = last_list->next;
 	}
-	head->next = NULL;
-
-	//=================================================================================
-
-	pushBack(getLast(head), in_file); // Creating a list of commands
-
-	element *out; // Creating a new item so as not to lose the beginning of the list
-	out = head;
-	while(out){
-		if(out->vect == 'v'){	// If the operation with vectors, then calling the calculator for vectors
-			vector_calculator_file(out_file, out);
-		}else{	// If the operation with numbers, then we call the usual calculator
-			regular_calculator_file(out_file, out);
-		}
-		out = out->next; // Moving on the list
-		fprintf(out_file, "\n");
-	}
-
-	//=================================================================================
-
 	fclose(in_file);
-	fclose(out_file);
 
-	//printList(head);	Printing the list to console
+	last_list = head_list;
+	stek *head_stek;
+	head_stek = (stek*) malloc(sizeof(stek));
+	head_stek->value = atof(last_list->emelement);
+	head_stek->next = NULL;
+	while (last_list) {	// Проход по всем елементам списка
+		if (last_list->emelement[0] == '+'
+			|| last_list->emelement[0] == '*'
+			|| last_list->emelement[0] == '/'
+			|| (last_list->emelement[0] == '-'
+				&& strlen(last_list->emelement) == 1)) { // Если операция
+			switch (last_list->emelement[0]) {
+			case '+':
+				head_stek->next->value = head_stek->next->value
+										+ head_stek->value;
+				break;
+			case '-':
+				head_stek->next->value = head_stek->next->value
+										- head_stek->value;
+				break;
+			case '*':
+				head_stek->next->value = head_stek->next->value
+										* head_stek->value;
+				break;
+			case '.':
+				head_stek->next->value = head_stek->next->value
+										/ head_stek->value;
+				break;
+			}
+			head_stek = head_stek->next;
+		} else {	// Если число, добавляем его в стек
+			stek *tmp = (stek*) malloc(sizeof(stek));
+			tmp->value = atof(last_list->emelement);
+			tmp->next = head_stek;
+			head_stek = tmp;
+		}
+		last_list = last_list->next;
+	}
+	// Вывод результата в файл
+	FILE *out_file;
+	out_file = fopen("output.txt", "w");
+	fprintf(out_file, "result: %.2f", head_stek->value);
+	fclose(out_file);
 
 	return EXIT_SUCCESS;
 }
