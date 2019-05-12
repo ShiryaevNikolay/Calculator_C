@@ -27,10 +27,6 @@ typedef struct arr_val {
 	struct arr_val *next;
 } arr_val;
 
-void clear () {
-
-}
-
 queue* pushBack (FILE *in_file, char c) {
 	arr_val *head_arr; // Объявляем список для чисел >=10 и отрицательных чисел
 	arr_val *last_arr;
@@ -74,8 +70,9 @@ int main(void) {
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
-	FILE *in_file;
+	FILE *in_file, *out_file;
 	in_file = fopen("input.txt", "r");
+	out_file = fopen("output.txt", "w");
 	char c;
 
 	// Создание первого элемента (головы) очереди
@@ -99,38 +96,39 @@ int main(void) {
 	head_stek->value = atof(head_queue->emelement);
 	head_stek->next = NULL;
 	while (head_queue) { // Проход по всем элементам очереди
-		if (head_queue->emelement[0] == '+'
-			|| head_queue->emelement[0] == '*'
-			|| head_queue->emelement[0] == '/'
-			|| (head_queue->emelement[0] == '-'
-				&& strlen(head_queue->emelement) == 1)) {
-			switch (head_queue->emelement[0]) {
-			case '+':
-				head_stek->next->value = head_stek->next->value + head_stek->value;
-				break;
-			case '-':
-				head_stek->next->value = head_stek->next->value - head_stek->value;
-				break;
-			case '*':
-				head_stek->next->value = head_stek->next->value * head_stek->value;
-				break;
-			case '/':
-				head_stek->next->value = head_stek->next->value / head_stek->value;
-				break;
+		if (head_queue->emelement[0] != '$') {
+			if (head_queue->emelement[0] == '+'
+				|| head_queue->emelement[0] == '*'
+				|| head_queue->emelement[0] == '/'
+				|| (head_queue->emelement[0] == '-'
+					&& strlen(head_queue->emelement) == 1)) {
+				switch (head_queue->emelement[0]) {
+				case '+':
+					head_stek->next->value = head_stek->next->value + head_stek->value;
+					break;
+				case '-':
+					head_stek->next->value = head_stek->next->value - head_stek->value;
+					break;
+				case '*':
+					head_stek->next->value = head_stek->next->value * head_stek->value;
+					break;
+				case '/':
+					head_stek->next->value = head_stek->next->value / head_stek->value;
+					break;
+				}
+				head_stek = head_stek->next;
+			} else { // Если число, добавляем его в стек
+				stek *tmp = (stek*)malloc(sizeof(stek));
+				tmp->value = atof(head_queue->emelement);
+				tmp->next = head_stek;
+				head_stek = tmp;
 			}
-			head_stek = head_stek->next;
-		} else { // Если число, добавляем его в стек
-			stek *tmp = (stek*)malloc(sizeof(stek));
-			tmp->value = atof(head_queue->emelement);
-			tmp->next = head_stek;
-			head_stek = tmp;
+			head_queue = head_queue->next;
+		} else {
+			// Вывод результата в файл
+			fprintf(out_file, "result: %.2f\n", head_stek->value);
+			head_queue = head_queue->next;
 		}
-		head_queue = head_queue->next;
 	}
-	// Вывод результата в файл
-	FILE *out_file;
-	out_file = fopen("output.txt", "w");
-	fprintf(out_file, "result: %.2f", head_stek->value);
-	fclose(out_file);
 	return EXIT_SUCCESS;
 }
