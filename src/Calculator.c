@@ -2,7 +2,7 @@
  ============================================================================
  Name        : Structure.c
  Author      : Nikolay Shiryaev
- Version     : Turn(1.0)
+ Version     : List(1.0)
  Copyright   : Your copyright notice
  Description : Calculator(structures) in C
  ============================================================================
@@ -10,125 +10,206 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-typedef struct queue {
-	char *emelement;
-	struct queue *next;
-} queue;
+typedef struct element {
+	char oper;
+	char vect;
+	int size;
+	float *value1;
+	float *value2;
+	struct element *next;
+} element;
 
-typedef struct stek {
-	float value;
-	struct stek *next;
-} stek;
+typedef struct res {
+	char vs;
+	int size;
+	float *result;
+	struct res *next;
+} res;
 
-typedef struct arr_val {
-	char c;
-	struct arr_val *next;
-} arr_val;
-
-queue* pushBack (FILE *in_file, char c) {
-	arr_val *head_arr; // Объявляем список для чисел >=10 и отрицательных чисел
-	arr_val *last_arr;
-	head_arr = (arr_val*) malloc(sizeof(arr_val));
-	last_arr = (arr_val*) malloc(sizeof(arr_val));
-
-	char *array; // Объявляем массив для чисел >=10 и отрицательных чисел
-	int size = 0; // Кол-во символов в одном элементе (число, операция)
-	while (c != ' ') {
-		size++;
-		if (size == 1) { // Если кол-во симоволов элемента =1, то создаём первый элемент списка(голову)
-			head_arr->c = c;
-			head_arr->next = NULL;
-			last_arr = head_arr;
-		} else { // Иначе заполняем список, пока не достигнем 0
-			arr_val *tmp = (arr_val*) malloc(sizeof(arr_val));
-			tmp->c = c;
-			tmp->next = NULL;
-			last_arr->next = tmp;
-			last_arr = tmp;
-		}
-		if (feof(in_file) != 0)
-			break;
-		else
-			fscanf(in_file, "%c", &c);
+element* getLastEl(element *head){	// Finding the last item
+	if(head == NULL){
+		return NULL;
 	}
-	last_arr = head_arr; // Возвращаемся в начало списка
-	array = malloc(size * sizeof(char));
-	for (int i = 0; i < size; i++) { // Записываем значения из списка в массив
-		array[i] = last_arr->c;
-		last_arr = last_arr->next;
+	while(head->next){
+		head = head->next;
 	}
-	// Присваиваем массив (число, операция) в новый списка
-	queue *tmp = (queue*) malloc(sizeof(queue));
-	tmp->emelement = array;
+	return head;
+}
+
+res* getLastRes(res *head){	// Finding the last item
+	if(head == NULL){
+		return NULL;
+	}
+	while(head->next){
+		head = head->next;
+	}
+	return head;
+}
+
+void pushEl (element* head, FILE* in_file) {
+	element *last = getLastEl(head);
+	element *tmp = (element*)malloc(sizeof(element));
+
+	fscanf(in_file, " %c %c", &tmp->oper, &tmp->vect);
+	if (tmp->vect == 'v')
+		fscanf(in_file, "%d", &tmp->size);
+	else
+		tmp->size = 1;
+	tmp->value1 = malloc(tmp->size*sizeof(float));
+	tmp->value2 = malloc(tmp->size*sizeof(float));
+	for (int i = 0; i < tmp->size; i++)
+		fscanf(in_file, "%f", &tmp->value1[i]);
+	for (int i = 0; i < tmp->size; i++)
+		fscanf(in_file, "%f", &tmp->value2[i]);
 	tmp->next = NULL;
-	return tmp;
+	last->next = tmp;
+}
+
+void pushRes (element *el, res *result) {
+	res *tmp = (res*)malloc(sizeof(res));
+	if (el->vect == 'v') {
+		tmp->vs = 'v';
+		if (el->oper == '*' || el->oper == '/' || el->oper == '^' || el->oper == '!')
+			tmp->size = 1;
+		else
+			tmp->size = el->size;
+	} else {
+		tmp->vs = 's';
+		tmp->size = 1;
+	}
+	tmp->result = malloc(tmp->size*sizeof(float));
+	switch (el->oper) {
+	case '+':
+		for (int i = 0; i < tmp->size; i++)
+			tmp->result [i] = el->value1[i] + el->value2[i];
+		break;
+	case '-':
+		for (int i = 0; i < tmp->size; i++)
+			tmp->result [i] = el->value1[i] - el->value2[i];
+		break;
+	case '*':
+		tmp->result[0] = 0;
+		for (int i = 0; i < el->size; i++)
+			tmp->result[0] = tmp->result[0] + el->value1[i] * el->value2[i];
+		break;
+	case '/':
+		tmp->result[0] = el->value1[0] / el->value2[0];
+		break;
+	case '^':
+		tmp->result[0] = el->value1[0];
+		if (el->value2[0] != 0) {
+			for (int i = 1;i < el->value2[0]; i++) {
+				tmp->result[0] = tmp->result[0] * el->value1[0];
+			}
+		} else
+			tmp->result[0] = 1;
+		break;
+	case '!':
+		tmp->result[0] = 1;
+		for (int i = 1; i <= el->value1[0]; i++) {
+			tmp->result[0] = tmp->result[0] * i;
+		}
+		break;
+	}
+	tmp->next = NULL;
+	result->next = tmp;
 }
 
 int main(void) {
 	setvbuf(stdout, NULL, _IONBF, 0);
 	setvbuf(stderr, NULL, _IONBF, 0);
 
-	FILE *in_file, *out_file;
+	FILE *in_file;
+
 	in_file = fopen("input.txt", "r");
-	out_file = fopen("output.txt", "w");
-	char c;
 
-	// Создание первого элемента (головы) очереди
-	queue *head_queue;
-	head_queue = (queue*)malloc(sizeof(queue));
-	fscanf(in_file, "%c", &c);
-	head_queue = pushBack(in_file, c);
+	element *head; // Creating the first list item
+	head = (element*)malloc(sizeof(element));
+	fscanf(in_file, "%c %c", &head->oper, &head->vect);
+	if (head->vect == 'v')
+		fscanf(in_file, "%d", &head->size);
+	else
+		head->size = 1;
+	head->value1 = malloc(head->size*sizeof(float));
+	head->value2 = malloc(head->size*sizeof(float));
+	for (int i = 0; i < head->size; i++)
+		fscanf(in_file, "%f", &head->value1[i]);
+	for (int i = 0; i < head->size; i++)
+		fscanf(in_file, "%f", &head->value2[i]);
+	head->next = NULL;
 
-	// Создание последнего элемента (хвоста) очереди
-	queue *tail_queue;
-	tail_queue = (queue*)malloc(sizeof(queue));
-	tail_queue = head_queue;
+	//=================================================================================
+
+	element *last = head;
 	while (!feof(in_file)) {
-		fscanf(in_file, "%c", &c);
-		tail_queue->next = pushBack(in_file, c);
-		tail_queue = tail_queue->next;
+		pushEl (getLastEl(last), in_file); // Добавление операций в список
 	}
+
 	fclose(in_file);
 
-	stek *head_stek = (stek*)malloc(sizeof(stek));
-	head_stek->value = atof(head_queue->emelement);
-	head_stek->next = NULL;
-	while (head_queue) { // Проход по всем элементам очереди
-		if (head_queue->emelement[0] != '$') {
-			if (head_queue->emelement[0] == '+'
-				|| head_queue->emelement[0] == '*'
-				|| head_queue->emelement[0] == '/'
-				|| (head_queue->emelement[0] == '-'
-					&& strlen(head_queue->emelement) == 1)) {
-				switch (head_queue->emelement[0]) {
-				case '+':
-					head_stek->next->value = head_stek->next->value + head_stek->value;
-					break;
-				case '-':
-					head_stek->next->value = head_stek->next->value - head_stek->value;
-					break;
-				case '*':
-					head_stek->next->value = head_stek->next->value * head_stek->value;
-					break;
-				case '/':
-					head_stek->next->value = head_stek->next->value / head_stek->value;
-					break;
-				}
-				head_stek = head_stek->next;
-			} else { // Если число, добавляем его в стек
-				stek *tmp = (stek*)malloc(sizeof(stek));
-				tmp->value = atof(head_queue->emelement);
-				tmp->next = head_stek;
-				head_stek = tmp;
-			}
-			head_queue = head_queue->next;
-		} else {
-			// Вывод результата в файл
-			fprintf(out_file, "result: %.2f\n", head_stek->value);
-			head_queue = head_queue->next;
-		}
+	last = head; // Возвращаемся в первый элемент списка
+
+	res *head_res = (res*)malloc(sizeof(res));
+	if (last->vect == 'v') {
+		head_res->vs = 'v';
+		if (last->oper == '*')
+			head_res->size = 1;
+		else
+			head_res->size = last->size;
+	} else {
+		head_res->vs = 's';
+		head_res->size = 1;
 	}
+	head_res->result = malloc(head_res->size*sizeof(float));
+	switch (last->oper) {
+	case '+':
+		for (int i = 0; i < head_res->size; i++)
+			head_res->result [i] = last->value1[i] + last->value2[i];
+		break;
+	case '-':
+		for (int i = 0; i < head_res->size; i++)
+			head_res->result [i] = last->value1[i] - last->value2[i];
+		break;
+	case '*':
+		head_res->result[0] = 0;
+		for (int i = 0; i < last->size; i++)
+			head_res->result[0] = head_res->result[0] + last->value1[i] * last->value2[i];
+		break;
+	case '/':
+		head_res->result[0] = last->value1[0] / last->value2[0];
+		break;
+	case '^':
+		head_res->result[0] = last->value1[0];
+		if (last->value2[0] != 0) {
+			for (int i = 1;i < last->value2[0]; i++) {
+				head_res->result[0] = head_res->result[0] * last->value1[0];
+			}
+		} else
+			head_res->result[0] = 1;
+		break;
+	case '!':
+		head_res->result[0] = 1;
+		for (int i =1; i <= last->value1[0]; i++) head_res->result[0] = head_res->result[0] * i;
+		break;
+	}
+	head_res->next = NULL;
+
+	last = head->next;
+	while (last) { // Заполняем список с результатами
+		pushRes (last, getLastRes(head_res));
+		last = last->next;
+	}
+
+	FILE *out_file = fopen("output.txt", "w");
+	res *last_r = head_res;
+	while (last_r->next != NULL) { // Вывод списка с результатами в консоль
+		for (int i = 0; i < last_r->size; i++)
+			fprintf(out_file, "%.0f ", last_r->result[i]);
+		fprintf(out_file, "\n");
+		last_r = last_r->next;
+	}
+	fclose(out_file);
+
 	return EXIT_SUCCESS;
 }
