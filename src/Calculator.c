@@ -203,10 +203,37 @@ int main(void) {
 
 	FILE *out_file = fopen("output.txt", "w");
 	res *last_r = head_res;
-	while (last_r->next != NULL) { // Вывод списка с результатами в консоль
-		for (int i = 0; i < last_r->size; i++)
-			fprintf(out_file, "%.0f ", last_r->result[i]);
+	last = head;
+	while (last_r->next) { // Вывод списка с результатами в консоль
+		if (last->vect == 'v' && last->oper != '*') {
+			fprintf(out_file, "(");
+			for (int i = 0; i < last->size; i++) {
+				fprintf(out_file, "%.0f", last->value1[i]);
+				if (i != last->size - 1) printf(" ");
+			}
+			fprintf(out_file, ") %c (", last->oper);
+			for (int i = 0; i < last->size; i++) {
+				fprintf(out_file, "%.0f", last->value2[i]);
+				if (i != last->size - 1) printf(" ");
+			}
+			fprintf(out_file, ") = (");
+			for (int i = 0; i < last_r->size; i++) {
+				fprintf(out_file, "%.0f", last_r->result[i]);
+				if (i != last_r->size - 1) printf(" ");
+			}
+			fprintf(out_file, ")");
+		} else {
+			if (last->vect == 'v') {
+				fprintf(out_file, "(a, b) = ");
+			} else if (last->oper != '!') {
+				fprintf(out_file, "%.0f %c %.0f = ", last->value1[0], last->oper, last->value2[0]);
+			} else {
+				fprintf(out_file, "%.0f! = ", last->value1[0]);
+			}
+			fprintf(out_file, "%.0f", last_r->result[0]);
+		}
 		fprintf(out_file, "\n");
+		last = last->next;
 		last_r = last_r->next;
 	}
 	fclose(out_file);
