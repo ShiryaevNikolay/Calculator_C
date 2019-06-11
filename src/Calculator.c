@@ -1,8 +1,8 @@
 /*
  ============================================================================
- Name        : Calculator.c
- Author      : Shiryaev Nikolay
- Version     :
+ Name        : Structure.c
+ Author      : Nikolay Shiryaev
+ Version     : List(1.0)
  Copyright   : Your copyright notice
  Description : Calculator in C, Ansi-style
  ============================================================================
